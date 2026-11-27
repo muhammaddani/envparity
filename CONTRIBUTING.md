@@ -48,3 +48,18 @@ examples/sample-app intentional fixture with known findings
 
 Include the language and snippet that was not detected, plus the output of
 `envguard --json` (it contains no secret values).
+
+## Releasing
+
+Releases are produced by `.github/workflows/release.yml` when a `v*` tag is
+pushed. Bump `version` in `package.json`, then:
+
+```bash
+git tag v0.2.0
+git push origin main --tags
+```
+
+The workflow runs the tests, verifies that the tag matches `package.json`,
+publishes to npm with provenance and opens a GitHub release. It needs an
+`NPM_TOKEN` repository secret (a granular npm token with read/write access to
+the `envguard` package).

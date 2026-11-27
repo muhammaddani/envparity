@@ -111,7 +111,11 @@ export function formatHuman(result, options = {}) {
       lines.push(c.green(`${SYMBOLS.ok} No environment variable usage found.`));
     } else {
       lines.push(
-        c.green(`${SYMBOLS.ok} All ${plural(result.summary.used, "variable")} used in code are documented.`),
+        c.green(
+          `${SYMBOLS.ok} All ${plural(result.summary.used, "variable")} used in code ${
+            result.summary.used === 1 ? "is" : "are"
+          } documented.`,
+        ),
       );
     }
     lines.push("");

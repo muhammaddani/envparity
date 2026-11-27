@@ -6,6 +6,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { version } from "../src/version.js";
+
 const BIN = fileURLToPath(new URL("../bin/envguard.js", import.meta.url));
 
 async function fixture(t, files) {
@@ -104,7 +106,7 @@ test("--json emits a machine-readable report", async (t) => {
   assert.equal(code, 0);
 
   const report = JSON.parse(stdout);
-  assert.equal(report.version, "0.1.0");
+  assert.equal(report.version, version);
   assert.equal(report.scannedFiles, 2);
   assert.deepEqual(
     report.missing.map((item) => item.key),
@@ -145,9 +147,9 @@ test("--help and --version exit 0", async (t) => {
   assert.equal(help.code, 0);
   assert.match(help.stdout, /Usage/);
 
-  const version = await cli(["--version"], dir);
-  assert.equal(version.code, 0);
-  assert.match(version.stdout, /^0\.1\.0/);
+  const versionOutput = await cli(["--version"], dir);
+  assert.equal(versionOutput.code, 0);
+  assert.match(versionOutput.stdout, new RegExp(`^${version.replace(/\./g, "\\.")}`));
 });
 
 test("invalid usage exits 2 with a helpful message", async (t) => {
