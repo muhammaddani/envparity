@@ -1,0 +1,49 @@
+{
+  "name": "envguard",
+  "version": "0.1.0",
+  "description": "Find environment variables that are used in code but missing from .env.example — and the ones documented but never used.",
+  "license": "MIT",
+  "author": "Muhammad Dani Noar <muhammaddani308@gmail.com>",
+  "type": "module",
+  "bin": {
+    "envguard": "bin/envguard.js"
+  },
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "action.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "self-check": "node bin/envguard.js . --strict --exclude \"examples/**,test/**\"",
+    "demo": "node bin/envguard.js examples/sample-app"
+  },
+  "keywords": [
+    "env",
+    "dotenv",
+    "environment-variables",
+    "cli",
+    "lint",
+    "ci",
+    "env-example",
+    "configuration",
+    "developer-tools"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muhammaddani/envguard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/muhammaddani/envguard/issues"
+  },
+  "homepage": "https://github.com/muhammaddani/envguard#readme"
+}
