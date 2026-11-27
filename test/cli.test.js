@@ -8,10 +8,10 @@ import { fileURLToPath } from "node:url";
 
 import { version } from "../src/version.js";
 
-const BIN = fileURLToPath(new URL("../bin/envguard.js", import.meta.url));
+const BIN = fileURLToPath(new URL("../bin/envparity.js", import.meta.url));
 
 async function fixture(t, files) {
-  const dir = await mkdtemp(path.join(tmpdir(), "envguard-cli-"));
+  const dir = await mkdtemp(path.join(tmpdir(), "envparity-cli-"));
   t.after(() => rm(dir, { recursive: true, force: true }));
   for (const [name, content] of Object.entries(files)) {
     const target = path.join(dir, name);
@@ -50,7 +50,7 @@ test("prints a human report and exits 0 without --strict", async (t) => {
   assert.match(stdout, /REDIS_URL/);
   assert.match(stdout, /OLD_FLAG/);
   assert.match(stdout, /never used in code/);
-  assert.match(stdout, /envguard --fix/);
+  assert.match(stdout, /envparity --fix/);
 });
 
 test("--strict exits 1 when variables are missing", async (t) => {

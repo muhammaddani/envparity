@@ -1,12 +1,12 @@
 # Contributing
 
-Thanks for taking the time to improve `envguard`.
+Thanks for taking the time to improve `envparity`.
 
 ## Setup
 
 ```bash
-git clone https://github.com/muhammaddani/envguard.git
-cd envguard
+git clone https://github.com/muhammaddani/envparity.git
+cd envparity
 npm test
 ```
 
@@ -17,7 +17,7 @@ feature, not an accident.
 ## Project layout
 
 ```
-bin/envguard.js     CLI entry point
+bin/envparity.js     CLI entry point
 src/cli.js          argument parsing, file resolution, exit codes
 src/scan.js         directory walking and file filtering
 src/extract.js      per-language patterns
@@ -47,7 +47,7 @@ examples/sample-app intentional fixture with known findings
 ## Reporting bugs
 
 Include the language and snippet that was not detected, plus the output of
-`envguard --json` (it contains no secret values).
+`envparity --json` (it contains no secret values).
 
 ## Releasing
 
@@ -62,7 +62,7 @@ git push origin main --tags
 The workflow runs the tests, verifies that the tag matches `package.json`,
 publishes to npm with provenance and opens a GitHub release. Publishing needs an
 `NPM_TOKEN` repository secret (a granular npm token with read/write access to
-the `envguard` package); without it the publish step is skipped and only the
+the `envparity` package); without it the publish step is skipped and only the
 GitHub release is created.
 
 Finally, move the floating major tag used by the GitHub Action:

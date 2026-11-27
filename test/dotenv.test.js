@@ -48,7 +48,7 @@ test("appends only missing keys and preserves the existing text", () => {
 
   assert.deepEqual(result.added, ["C", "D"]);
   assert.ok(result.content.startsWith(content));
-  assert.match(result.content, /# Added by envguard\r?\nC=\r?\nD=\r?\n$/);
+  assert.match(result.content, /# Added by envparity\r?\nC=\r?\nD=\r?\n$/);
   assert.deepEqual(parseDotenv(result.content).keys, ["A", "B", "C", "D"]);
 });
 

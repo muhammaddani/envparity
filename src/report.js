@@ -47,7 +47,7 @@ export function formatHuman(result, options = {}) {
   const lines = [];
 
   const header = [
-    c.bold("envguard"),
+    c.bold("envparity"),
     c.dim(result.version),
     c.dim("·"),
     `scanned ${plural(result.scannedFiles, "file")}`,
@@ -134,7 +134,7 @@ export function formatHuman(result, options = {}) {
     lines.push("");
     lines.push(
       c.dim(
-        `${SYMBOLS.arrow} Run \`envguard --fix\` to add ${plural(result.summary.missing, "missing key")} to ${result.exampleFile}.`,
+        `${SYMBOLS.arrow} Run \`envparity --fix\` to add ${plural(result.summary.missing, "missing key")} to ${result.exampleFile}.`,
       ),
     );
   }

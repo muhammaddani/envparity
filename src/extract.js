@@ -1,7 +1,7 @@
 /**
  * Extract environment-variable reads from source code.
  *
- * This is intentionally pattern based: envguard never executes project code,
+ * This is intentionally pattern based: envparity never executes project code,
  * never resolves imports, and never needs a language server. That keeps it
  * instant, safe, and usable on any repository.
  */

@@ -19,10 +19,10 @@ const EXAMPLE_CANDIDATES = [
 
 const DEFAULT_MAX_SIZE = 1024 * 1024;
 
-export const HELP = `envguard ${version} — keep .env.example honest
+export const HELP = `envparity ${version} — keep .env.example honest
 
 Usage
-  envguard [path] [options]
+  envparity [path] [options]
 
 Options
   -e, --example <file>    example env file to check against
@@ -46,10 +46,10 @@ Exit codes
   2  invalid usage or unreadable input
 
 Examples
-  envguard
-  envguard apps/web --strict
-  envguard --fix
-  envguard --json --ignore "AWS_*,CI"
+  envparity
+  envparity apps/web --strict
+  envparity --fix
+  envparity --json --ignore "AWS_*,CI"
 `;
 
 export class UsageError extends Error {}
@@ -222,7 +222,7 @@ export async function main(argv) {
     opts = parseArgv(argv);
   } catch (error) {
     if (error instanceof UsageError) {
-      process.stderr.write(`envguard: ${error.message}\n\n${HELP}`);
+      process.stderr.write(`envparity: ${error.message}\n\n${HELP}`);
       return 2;
     }
     throw error;
@@ -240,7 +240,7 @@ export async function main(argv) {
   const root = path.resolve(opts.path ?? ".");
   const rootStats = await statOrNull(root);
   if (!rootStats || !rootStats.isDirectory()) {
-    process.stderr.write(`envguard: not a directory: ${opts.path ?? "."}\n`);
+    process.stderr.write(`envparity: not a directory: ${opts.path ?? "."}\n`);
     return 2;
   }
 
@@ -248,14 +248,14 @@ export async function main(argv) {
   const exampleExists = Boolean(await statOrNull(examplePath));
   if (!exampleExists && !opts.fix) {
     if (opts.example) {
-      process.stderr.write(`envguard: example file not found: ${opts.example}\n`);
+      process.stderr.write(`envparity: example file not found: ${opts.example}\n`);
       return 2;
     }
     process.stderr.write(
       [
-        `envguard: no example env file found in ${displayPath(root)}`,
+        `envparity: no example env file found in ${displayPath(root)}`,
         `  Looked for: ${EXAMPLE_CANDIDATES.join(", ")}`,
-        "  Create one, pass --example <file>, or run `envguard --fix` to generate .env.example.",
+        "  Create one, pass --example <file>, or run `envparity --fix` to generate .env.example.",
         "",
       ].join("\n"),
     );
@@ -269,7 +269,7 @@ export async function main(argv) {
       const fromRoot = path.resolve(root, opts.env);
       if (await statOrNull(fromRoot)) envPath = fromRoot;
       else {
-        process.stderr.write(`envguard: env file not found: ${opts.env}\n`);
+        process.stderr.write(`envparity: env file not found: ${opts.env}\n`);
         return 2;
       }
     }
@@ -280,7 +280,7 @@ export async function main(argv) {
     try {
       ignore.push(...(await readIgnoreFile(path.resolve(opts.ignoreFile))));
     } catch {
-      process.stderr.write(`envguard: cannot read ignore file: ${opts.ignoreFile}\n`);
+      process.stderr.write(`envparity: cannot read ignore file: ${opts.ignoreFile}\n`);
       return 2;
     }
   }
@@ -291,7 +291,7 @@ export async function main(argv) {
     if (exampleExists) exampleContent = await fs.readFile(examplePath, "utf8");
     if (envPath) envKeys = parseDotenv(await fs.readFile(envPath, "utf8")).keys;
   } catch (error) {
-    process.stderr.write(`envguard: cannot read ${error.path ?? "input file"}: ${error.message}\n`);
+    process.stderr.write(`envparity: cannot read ${error.path ?? "input file"}: ${error.message}\n`);
     return 2;
   }
 
@@ -319,7 +319,7 @@ export async function main(argv) {
         await fs.mkdir(path.dirname(examplePath), { recursive: true });
         await fs.writeFile(examplePath, result.content);
       } catch (error) {
-        process.stderr.write(`envguard: cannot write ${displayPath(examplePath)}: ${error.message}\n`);
+        process.stderr.write(`envparity: cannot write ${displayPath(examplePath)}: ${error.message}\n`);
         return 2;
       }
       exampleContent = result.content;

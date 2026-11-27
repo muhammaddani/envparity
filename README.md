@@ -1,12 +1,12 @@
-# envguard
+# envparity
 
 **Keep `.env.example` honest.**
 
-`envguard` scans your source code, finds every environment variable you actually read, and tells you which ones are missing from your example env file — plus the ones you documented but never use.
+`envparity` scans your source code, finds every environment variable you actually read, and tells you which ones are missing from your example env file — plus the ones you documented but never use.
 
 No config. No dependencies. No network. One command.
 
-[![CI](https://github.com/muhammaddani/envguard/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammaddani/envguard/actions/workflows/ci.yml)
+[![CI](https://github.com/muhammaddani/envparity/actions/workflows/ci.yml/badge.svg)](https://github.com/muhammaddani/envparity/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ---
@@ -15,10 +15,10 @@ No config. No dependencies. No network. One command.
 
 Every project has a `.env.example`, and it drifts. Somebody adds `STRIPE_WEBHOOK_SECRET`, ships it, and the next person cloning the repo gets a runtime crash instead of a readable list of what to fill in. Meanwhile `OLD_S3_BUCKET` stays in the example for two years after the feature was deleted.
 
-`envguard` compares the two sides and reports the gap:
+`envparity` compares the two sides and reports the gap:
 
 ```
-envguard 0.1.0 · scanned 2 files · example examples/sample-app/.env.example
+envparity 0.1.0 · scanned 2 files · example examples/sample-app/.env.example
 
 ✖ 2 variables used in code but missing from examples/sample-app/.env.example
     REDIS_URL               src/worker.py:5
@@ -32,23 +32,23 @@ envguard 0.1.0 · scanned 2 files · example examples/sample-app/.env.example
 
 6 used · 5 documented · 2 missing · 1 unused
 
-→ Run `envguard --fix` to add 2 missing keys to examples/sample-app/.env.example.
+→ Run `envparity --fix` to add 2 missing keys to examples/sample-app/.env.example.
 ```
 
 ## Quick start
 
 ```bash
 # run once, no install
-npx envguard
+npx envparity
 
 # or install it in the project
-npm install --save-dev envguard
+npm install --save-dev envparity
 
 # fail CI when the example file is behind
-npx envguard --strict
+npx envparity --strict
 ```
 
-`envguard` auto-detects `.env.example`, `.env.sample`, `.env.template`, `.env.dist`, `.env.defaults`, `env.example`, and `example.env`.
+`envparity` auto-detects `.env.example`, `.env.sample`, `.env.template`, `.env.dist`, `.env.defaults`, `env.example`, and `example.env`.
 
 ## What it reports
 
@@ -64,7 +64,7 @@ Values are never read, printed, or transmitted. Only key names and line numbers 
 ## Usage
 
 ```
-envguard [path] [options]
+envparity [path] [options]
 
 Options
   -e, --example <file>    example env file to check against
@@ -100,7 +100,7 @@ Appends `KEY=` lines for missing variables without touching what you already wro
   PORT=3000
   DATABASE_URL=postgres://localhost:5432/app
 +
-+ # Added by envguard
++ # Added by envparity
 + REDIS_URL=
 + SMTP_HOST=
 ```
@@ -110,9 +110,9 @@ Running it twice changes nothing.
 ### Monorepos
 
 ```bash
-envguard apps/web --strict
-envguard apps/api --example ../../.env.example
-envguard . --include "packages/*/src/**" --exclude "**/*.test.js"
+envparity apps/web --strict
+envparity apps/api --example ../../.env.example
+envparity . --include "packages/*/src/**" --exclude "**/*.test.js"
 ```
 
 ## GitHub Action
@@ -126,7 +126,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: muhammaddani/envguard@v1
+      - uses: muhammaddani/envparity@v1
         with:
           path: .
           strict: "true"
@@ -156,7 +156,7 @@ Variables are only collected when the name looks like a constant (`^[A-Z][A-Z0-9
 
 ```js
 import { readFile } from "node:fs/promises";
-import { analyze, parseDotenv, scanProject } from "envguard";
+import { analyze, parseDotenv, scanProject } from "envparity";
 
 const scan = await scanProject(".");
 const example = parseDotenv(await readFile(".env.example", "utf8"));
@@ -174,23 +174,23 @@ console.log(report.missing);
 Some variables are provided by the platform (`CI`, `AWS_REGION`, `VERCEL_*`) and are not worth documenting:
 
 ```bash
-envguard --ignore "CI,AWS_*,VERCEL_*"
+envparity --ignore "CI,AWS_*,VERCEL_*"
 ```
 
 ```text
-# .envguardignore
+# .envparityignore
 CI
 AWS_*
 VERCEL_*
 ```
 
 ```bash
-envguard --ignore-file .envguardignore
+envparity --ignore-file .envparityignore
 ```
 
 ## How it works
 
-`envguard` is a single pass of pattern matching over text files. It never executes your code, never loads plugins, and never makes a network request. That makes it fast enough for a pre-commit hook and safe enough to run on untrusted repositories.
+`envparity` is a single pass of pattern matching over text files. It never executes your code, never loads plugins, and never makes a network request. That makes it fast enough for a pre-commit hook and safe enough to run on untrusted repositories.
 
 The trade-off: it does not resolve aliases, re-exports, or configuration indirection. When it cannot see the key, it says so in the **dynamic** section instead of guessing.
 

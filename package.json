@@ -1,12 +1,12 @@
 {
-  "name": "envguard",
+  "name": "envparity",
   "version": "0.1.0",
   "description": "Find environment variables that are used in code but missing from .env.example — and the ones documented but never used.",
   "license": "MIT",
   "author": "Muhammad Dani Noar <muhammaddani308@gmail.com>",
   "type": "module",
   "bin": {
-    "envguard": "bin/envguard.js"
+    "envparity": "bin/envparity.js"
   },
   "main": "./src/index.js",
   "exports": {
@@ -24,8 +24,8 @@
   },
   "scripts": {
     "test": "node --test",
-    "self-check": "node bin/envguard.js . --strict --exclude \"examples/**,test/**\"",
-    "demo": "node bin/envguard.js examples/sample-app"
+    "self-check": "node bin/envparity.js . --strict --exclude \"examples/**,test/**\"",
+    "demo": "node bin/envparity.js examples/sample-app"
   },
   "keywords": [
     "env",
@@ -40,10 +40,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/muhammaddani/envguard.git"
+    "url": "git+https://github.com/muhammaddani/envparity.git"
   },
   "bugs": {
-    "url": "https://github.com/muhammaddani/envguard/issues"
+    "url": "https://github.com/muhammaddani/envparity/issues"
   },
-  "homepage": "https://github.com/muhammaddani/envguard#readme"
+  "homepage": "https://github.com/muhammaddani/envparity#readme"
 }

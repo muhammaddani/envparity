@@ -59,7 +59,7 @@ export function stringifyDotenv(entries, eol = "\n") {
  * @returns {{content: string, added: string[]}}
  */
 export function appendKeys(content, keys, options = {}) {
-  const header = options.header ?? "# Added by envguard";
+  const header = options.header ?? "# Added by envparity";
   const { eol, keys: existing } = parseDotenv(content);
   const have = new Set(existing);
   const toAdd = [];

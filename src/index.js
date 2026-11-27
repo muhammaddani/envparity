@@ -2,7 +2,7 @@
  * Public programmatic API.
  *
  * @example
- * import { scanProject, analyze, parseDotenv } from "envguard";
+ * import { scanProject, analyze, parseDotenv } from "envparity";
  *
  * const scan = await scanProject(process.cwd());
  * const example = parseDotenv(await readFile(".env.example", "utf8"));

@@ -1,4 +1,4 @@
-"""Background worker used by the envguard demo project."""
+"""Background worker used by the envparity demo project."""
 
 import os
 

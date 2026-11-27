@@ -7,7 +7,7 @@ import path from "node:path";
 import { scanProject } from "../src/scan.js";
 
 async function fixture(t, files) {
-  const dir = await mkdtemp(path.join(tmpdir(), "envguard-scan-"));
+  const dir = await mkdtemp(path.join(tmpdir(), "envparity-scan-"));
   t.after(() => rm(dir, { recursive: true, force: true }));
   for (const [name, content] of Object.entries(files)) {
     const target = path.join(dir, name);

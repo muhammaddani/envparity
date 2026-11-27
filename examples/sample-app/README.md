@@ -9,7 +9,7 @@ A tiny fixture used by `npm run demo`. It intentionally has problems:
 Run it with:
 
 ```bash
-node bin/envguard.js examples/sample-app
+node bin/envparity.js examples/sample-app
 # or fix the example file:
-node bin/envguard.js examples/sample-app --fix
+node bin/envparity.js examples/sample-app --fix
 ```

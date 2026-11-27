@@ -4,7 +4,7 @@ const port = Number(process.env.PORT ?? 3000);
 const databaseUrl = process.env.DATABASE_URL;
 const jwtSecret = process.env.JWT_SECRET;
 
-// A dynamic lookup: envguard cannot know this key without running the code,
+// A dynamic lookup: envparity cannot know this key without running the code,
 // so it reports it as "dynamic" instead of guessing.
 const configKey = "region";
 const dynamicValue = process.env[configKey];

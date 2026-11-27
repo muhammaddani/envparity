@@ -32,7 +32,7 @@ jobs:
       - run: npm test
 
   self-check:
-    name: envguard checks itself
+    name: envparity checks itself
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

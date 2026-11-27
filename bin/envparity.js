@@ -6,6 +6,6 @@ main(process.argv.slice(2))
     process.exitCode = code;
   })
   .catch((error) => {
-    process.stderr.write(`envguard: unexpected error: ${error?.stack ?? error}\n`);
+    process.stderr.write(`envparity: unexpected error: ${error?.stack ?? error}\n`);
     process.exitCode = 2;
   });

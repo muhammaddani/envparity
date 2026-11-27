@@ -1,4 +1,4 @@
-name: envguard
+name: envparity
 description: Keep .env.example in sync with the environment variables your code actually reads
 author: Muhammad Dani Noar
 
@@ -24,14 +24,14 @@ inputs:
     required: false
     default: "false"
   args:
-    description: Extra arguments forwarded to the envguard CLI
+    description: Extra arguments forwarded to the envparity CLI
     required: false
     default: ""
 
 runs:
   using: composite
   steps:
-    - name: Run envguard
+    - name: Run envparity
       shell: bash
       env:
         INPUT_PATH: ${{ inputs.path }}
@@ -46,4 +46,4 @@ runs:
         if [ "$INPUT_STRICT" = "true" ]; then args+=(--strict); fi
         if [ "$INPUT_FIX" = "true" ]; then args+=(--fix); fi
         # shellcheck disable=SC2086
-        node "$GITHUB_ACTION_PATH/bin/envguard.js" "${args[@]}" $INPUT_ARGS
+        node "$GITHUB_ACTION_PATH/bin/envparity.js" "${args[@]}" $INPUT_ARGS
