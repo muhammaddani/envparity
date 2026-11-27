@@ -52,6 +52,32 @@ test("ignore globs remove keys from every section", () => {
   assert.deepEqual(result.ignored, { usages: 2, documented: 1 });
 });
 
+test("mentions turn stale documentation into indirect references", () => {
+  const result = analyze({
+    usages: [{ key: "PORT", file: "src/app.js", line: 1, lang: "javascript" }],
+    dynamic: [],
+    example: parseDotenv("PORT=3000\nCONFIG_ONLY=1\nSTALE=1\n"),
+    mentions: new Map([["CONFIG_ONLY", ["turbo.json", "compose.yml"]]]),
+  });
+  assert.deepEqual(result.unused.map((item) => item.key), ["STALE"]);
+  assert.deepEqual(result.indirect, [{ key: "CONFIG_ONLY", line: 2, files: ["turbo.json", "compose.yml"] }]);
+  assert.equal(result.summary.indirect, 1);
+  assert.equal(result.summary.unused, 1);
+});
+
+test("byArea counts where the findings come from", () => {
+  const result = analyze({
+    usages: [
+      { key: "A", file: "src/a.js", line: 1, lang: "javascript" },
+      { key: "B", file: "src/b.test.js", line: 1, lang: "javascript" },
+      { key: "C", file: "scripts/deploy.sh", line: 1, lang: "shell" },
+    ],
+    dynamic: [],
+    example: parseDotenv(""),
+  });
+  assert.deepEqual(result.byArea, { app: 1, tests: 1, scripts: 1, docs: 0 });
+});
+
 test("clean projects produce empty findings", () => {
   const result = analyze({
     usages: [{ key: "PORT", file: "app.js", line: 1, lang: "javascript" }],

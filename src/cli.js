@@ -295,19 +295,22 @@ export async function main(argv) {
     return 2;
   }
 
+  let example = parseDotenv(exampleContent);
+
   const scan = await scanProject(root, {
     include: opts.include,
     exclude: opts.exclude,
     maxSize: opts.maxSize,
+    mentionKeys: example.keys,
   });
 
-  let example = parseDotenv(exampleContent);
   let analysis = analyze({
     usages: scan.usages,
     dynamic: scan.dynamic,
     example,
     envKeys,
     ignore,
+    mentions: scan.mentions,
   });
 
   let added = [];
@@ -330,6 +333,7 @@ export async function main(argv) {
         example,
         envKeys,
         ignore,
+        mentions: scan.mentions,
       });
     }
   }

@@ -1,4 +1,5 @@
 import { createMatcher } from "./glob.js";
+import { countByArea } from "./areas.js";
 
 function byKey(a, b) {
   return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
@@ -24,10 +25,12 @@ function groupByFile(locations) {
  * @param {{keys: string[], lineByKey: Map<string, number>}} input.example
  * @param {string[]|null} [input.envKeys] keys present in a real env file, if provided
  * @param {string[]} [input.ignore] key globs to ignore
+ * @param {Map<string, string[]>} [input.mentions] documented keys seen in config/docs/templates
  */
-export function analyze({ usages, dynamic, example, envKeys = null, ignore = [] }) {
+export function analyze({ usages, dynamic, example, envKeys = null, ignore = [], mentions = new Map() }) {
   const ignored = createMatcher(ignore);
   const ignoredCounts = { usages: 0, documented: 0 };
+  const countedUsages = [];
 
   /** @type {Map<string, {file: string, line: number, lang: string}[]>} */
   const used = new Map();
@@ -36,6 +39,7 @@ export function analyze({ usages, dynamic, example, envKeys = null, ignore = [] 
       ignoredCounts.usages += 1;
       continue;
     }
+    countedUsages.push(usage);
     if (!used.has(usage.key)) used.set(usage.key, []);
     used.get(usage.key).push({ file: usage.file, line: usage.line, lang: usage.lang });
   }
@@ -58,10 +62,17 @@ export function analyze({ usages, dynamic, example, envKeys = null, ignore = [] 
     .map(([key, locations]) => ({ key, usages: locations, files: groupByFile(locations) }))
     .sort(byKey);
 
-  const unused = documentedKeys
-    .filter((key) => !used.has(key))
-    .map((key) => ({ key, line: example.lineByKey.get(key) ?? null }))
-    .sort(byKey);
+  const unused = [];
+  const indirect = [];
+  for (const key of documentedKeys) {
+    if (used.has(key)) continue;
+    const line = example.lineByKey.get(key) ?? null;
+    const seenIn = mentions.get(key) ?? [];
+    if (seenIn.length > 0) indirect.push({ key, line, files: seenIn });
+    else unused.push({ key, line });
+  }
+  unused.sort(byKey);
+  indirect.sort(byKey);
 
   let undeclared = [];
   if (envKeys) {
@@ -75,14 +86,17 @@ export function analyze({ usages, dynamic, example, envKeys = null, ignore = [] 
   return {
     missing,
     unused,
+    indirect,
     undeclared,
     dynamic,
     ignored: ignoredCounts,
+    byArea: countByArea(countedUsages),
     summary: {
       used: used.size,
       documented: documentedKeys.length,
       missing: missing.length,
       unused: unused.length,
+      indirect: indirect.length,
       undeclared: undeclared.length,
       dynamic: dynamic.length,
     },

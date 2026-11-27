@@ -1,0 +1,15 @@
+- id: envparity
+  name: envparity
+  description: Check that environment variables used in code are documented in .env.example
+  entry: envparity
+  language: node
+  types: [text]
+  pass_filenames: false
+
+- id: envparity-fix
+  name: envparity (auto-fix .env.example)
+  description: Append missing keys to .env.example before committing
+  entry: envparity --fix
+  language: node
+  types: [text]
+  pass_filenames: false

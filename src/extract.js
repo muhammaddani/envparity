@@ -24,6 +24,8 @@ const LANGUAGES = [
       /(?<![\w$.])import\.meta\.env\.([A-Z][A-Z0-9_]*)/g,
       /(?<![\w$.])import\.meta\.env\[\s*["'`]([A-Z][A-Z0-9_]*)["'`]\s*\]/g,
       /\bDeno\.env\.get\(\s*["'`]([A-Z][A-Z0-9_]*)["'`]/g,
+      /\bconfigService\.get\(\s*["'`]([A-Z][A-Z0-9_]*)["'`]/g,
+      /(?<![\w$.])(?:env|environment)\.([A-Z][A-Z0-9_]*)/g,
     ],
     dynamic: [
       /(?<![\w$.])process\.env\s*\[\s*[^\s"'`]/,
@@ -39,6 +41,7 @@ const LANGUAGES = [
       /os\.environ\[\s*["']([A-Z][A-Z0-9_]*)["']\s*\]/g,
       /os\.environ\.get\(\s*["']([A-Z][A-Z0-9_]*)["']/g,
       /os\.getenv\(\s*["']([A-Z][A-Z0-9_]*)["']/g,
+      /(?<![\w.])env\(\s*["']([A-Z][A-Z0-9_]*)["']/g,
     ],
     dynamic: [/os\.environ\[\s*[^\s"']/, /os\.(?:environ\.get|getenv)\(\s*[^\s"')]/],
   },
@@ -61,7 +64,7 @@ const LANGUAGES = [
   },
   {
     name: "ruby",
-    test: (base) => /\.(?:rb|rake)$/i.test(base),
+    test: (base) => /\.(?:rb|rake|erb)$/i.test(base),
     stripComments: false,
     patterns: [
       /\bENV\[\s*["']([A-Z][A-Z0-9_]*)["']\s*\]/g,
@@ -76,6 +79,7 @@ const LANGUAGES = [
     patterns: [
       /\bgetenv\(\s*["']([A-Z][A-Z0-9_]*)["']\s*\)/g,
       /\$_ENV\[\s*["']([A-Z][A-Z0-9_]*)["']\s*\]/g,
+      /\benv\(\s*["']([A-Z][A-Z0-9_]*)["']/g,
     ],
     dynamic: [/\bgetenv\(\s*[^\s"')]/, /\$_ENV\[\s*[^\s"']/],
   },
@@ -83,7 +87,10 @@ const LANGUAGES = [
     name: "jvm",
     test: (base) => /\.(?:java|kt|kts|scala)$/i.test(base),
     stripComments: true,
-    patterns: [/System\.getenv\(\s*"([A-Z][A-Z0-9_]*)"\s*\)/g],
+    patterns: [
+      /System\.getenv\(\s*"([A-Z][A-Z0-9_]*)"\s*\)/g,
+      /@Value\(\s*"\$\{([A-Z][A-Z0-9_]*)(?::[^}]*)?\}"\)/g,
+    ],
     dynamic: [/System\.getenv\(\s*[^\s")]/],
   },
   {
@@ -92,6 +99,30 @@ const LANGUAGES = [
     stripComments: true,
     patterns: [/Environment\.GetEnvironmentVariable\(\s*"([A-Z][A-Z0-9_]*)"\s*\)/g],
     dynamic: [/Environment\.GetEnvironmentVariable\(\s*[^\s")]/],
+  },
+  {
+    name: "c",
+    test: (base) => /\.(?:c|h|cc|cpp|cxx|hpp|hh)$/i.test(base),
+    stripComments: true,
+    patterns: [/\bgetenv\(\s*"([A-Z][A-Z0-9_]*)"\s*\)/g],
+    dynamic: [/\bgetenv\(\s*[^\s")]/],
+  },
+  {
+    name: "elixir",
+    test: (base) => /\.(?:ex|exs)$/i.test(base),
+    stripComments: false,
+    patterns: [/\bSystem\.get_env\(\s*"([A-Z][A-Z0-9_]*)"\s*\)/g],
+    dynamic: [/\bSystem\.get_env\(\s*[^\s")]/],
+  },
+  {
+    name: "dart",
+    test: (base) => base.endsWith(".dart"),
+    stripComments: true,
+    patterns: [
+      /\bString\.fromEnvironment\(\s*["']([A-Z][A-Z0-9_]*)["']/g,
+      /\bPlatform\.environment\[\s*["']([A-Z][A-Z0-9_]*)["']\s*\]/g,
+    ],
+    dynamic: [],
   },
   {
     name: "shell",
@@ -134,6 +165,12 @@ export function extractFromSource(content, filename) {
   const basename = filename.split(/[\\/]/).pop();
   const language = LANGUAGES.find((candidate) => candidate.test(basename));
   if (!language) return null;
+
+  // Cheap gate: no env-like token and no shell interpolation means there is
+  // nothing this file could contribute. Skipping here keeps large repos fast.
+  if (!/env|configService|\$\{/i.test(content)) {
+    return { lang: language.name, usages: [], dynamic: [] };
+  }
 
   const text = language.stripComments ? stripBlockComments(content) : content;
   const lines = text.split(/\r?\n/);

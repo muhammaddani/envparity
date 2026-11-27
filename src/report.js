@@ -71,6 +71,14 @@ export function formatHuman(result, options = {}) {
     for (const item of result.missing) {
       lines.push(`    ${c.bold(padEnd(item.key, 24))}${c.dim(formatLocations(item.files))}`);
     }
+    const areas = result.byArea ?? {};
+    const labels = { app: "app", tests: "tests", scripts: "scripts", docs: "docs" };
+    const parts = Object.entries(labels)
+      .filter(([name]) => (areas[name] ?? 0) > 0)
+      .map(([name, label]) => `${label} ${areas[name]}`);
+    if (parts.length > 1) {
+      lines.push(`    ${c.dim(`from: ${parts.join(" · ")}${result.dynamic.length ? " (locations, not keys)" : ""}`)}`);
+    }
     lines.push("");
   }
 
@@ -91,6 +99,22 @@ export function formatHuman(result, options = {}) {
     for (const item of result.unused) {
       const location = item.line ? `${result.exampleFile}:${item.line}` : result.exampleFile;
       lines.push(`    ${c.bold(padEnd(item.key, 24))}${c.dim(location)}`);
+    }
+    lines.push("");
+  }
+
+  if (result.indirect.length > 0) {
+    lines.push(
+      c.cyan(
+        `${SYMBOLS.info} ${plural(result.indirect.length, "variable")} documented but not read in code (referenced in config, docs or templates)`,
+      ),
+    );
+    for (const item of result.indirect.slice(0, 8)) {
+      const where = item.files.length > 1 ? `${item.files[0]} +${item.files.length - 1}` : item.files[0];
+      lines.push(`    ${c.bold(padEnd(item.key, 24))}${c.dim(where)}`);
+    }
+    if (result.indirect.length > 8) {
+      lines.push(`    ${c.dim(`+${result.indirect.length - 8} more`)}`);
     }
     lines.push("");
   }
@@ -127,6 +151,7 @@ export function formatHuman(result, options = {}) {
     `${result.summary.missing} missing`,
     `${result.summary.unused} unused`,
   ];
+  if (result.summary.indirect > 0) summary.push(`${result.summary.indirect} indirect`);
   if (result.envFile) summary.push(`${result.summary.undeclared} undeclared`);
   lines.push(c.dim(summary.join(" · ")));
 
@@ -155,12 +180,14 @@ export function formatJson(result) {
       envFile: result.envFile,
       scannedFiles: result.scannedFiles,
       languages: result.languages,
+      byArea: result.byArea,
       summary: result.summary,
       missing: result.missing.map((item) => ({
         key: item.key,
         usages: item.usages.map(({ file, line }) => ({ file, line })),
       })),
       unused: result.unused,
+      indirect: result.indirect,
       undeclared: result.undeclared.map((item) => ({
         key: item.key,
         usages: item.usages.map(({ file, line }) => ({ file, line })),

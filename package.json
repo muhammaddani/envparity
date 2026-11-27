@@ -1,7 +1,7 @@
 {
   "name": "envparity",
-  "version": "0.1.0",
-  "description": "Find environment variables that are used in code but missing from .env.example — and the ones documented but never used.",
+  "version": "0.2.0",
+  "description": "Keep your code and .env.example in parity: find environment variables used in code but missing from the example file, and the ones documented but never used.",
   "license": "MIT",
   "author": "Muhammad Dani Noar <muhammaddani308@gmail.com>",
   "type": "module",
@@ -36,6 +36,10 @@
     "ci",
     "env-example",
     "configuration",
+    "config-drift",
+    "dotenv-example",
+    "monorepo",
+    "pre-commit",
     "developer-tools"
   ],
   "repository": {

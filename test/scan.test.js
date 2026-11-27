@@ -74,6 +74,22 @@ test("skips large and binary files", async (t) => {
   assert.equal(scan.skipped.binary, 1);
 });
 
+test("collects mentions from config files but ignores docs", async (t) => {
+  const dir = await fixture(t, {
+    "src/app.js": "process.env.PORT;\n",
+    "turbo.json": '{"globalEnv":["DB_HOST","PORT"]}\n',
+    "docker-compose.yml": "services:\n  db:\n    environment:\n      REDIS_URL: redis://db\n",
+    "README.md": "Set STALE_KEY to enable the old thing.\n",
+    "package-lock.json": '{"STALE_KEY": 1}\n',
+  });
+
+  const scan = await scanProject(dir, { mentionKeys: ["DB_HOST", "REDIS_URL", "STALE_KEY", "PORT"] });
+  assert.deepEqual(scan.mentions.get("DB_HOST"), ["turbo.json"]);
+  assert.deepEqual(scan.mentions.get("REDIS_URL"), ["docker-compose.yml"]);
+  assert.equal(scan.mentions.has("STALE_KEY"), false);
+  assert.equal(scan.mentionFilesScanned, 2);
+});
+
 test("returns an empty result for a project without env usage", async (t) => {
   const dir = await fixture(t, { "src/index.js": "export const answer = 42;\n" });
   const scan = await scanProject(dir);

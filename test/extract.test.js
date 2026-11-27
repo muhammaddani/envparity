@@ -17,6 +17,10 @@ test("detects languages from the file name", () => {
   assert.equal(detectLanguage("deploy.sh"), "shell");
   assert.equal(detectLanguage("Dockerfile"), "dockerfile");
   assert.equal(detectLanguage("docker-compose.yml"), "compose");
+  assert.equal(detectLanguage("layout.erb"), "ruby");
+  assert.equal(detectLanguage("main.c"), "c");
+  assert.equal(detectLanguage("runtime.exs"), "elixir");
+  assert.equal(detectLanguage("main.dart"), "dart");
   assert.equal(detectLanguage("README.md"), null);
 });
 
@@ -95,6 +99,21 @@ test("shell and docker use ${VAR} only", () => {
   assert.deepEqual(keys("services:\n  db:\n    image: ${POSTGRES_IMAGE}\n", "docker-compose.yml"), [
     "POSTGRES_IMAGE",
   ]);
+});
+
+test("python: django-environ env() helper", () => {
+  assert.deepEqual(keys('SECRET_KEY = env("DJANGO_SECRET_KEY")', "settings.py"), ["DJANGO_SECRET_KEY"]);
+  assert.deepEqual(keys("x = self.env(\"NOT_MODULE_LEVEL\")", "settings.py"), []);
+});
+
+test("templates and framework helpers", () => {
+  assert.deepEqual(keys("<%= ENV['ANDROID_BUNDLE_ID'] %>", "assetlinks.json.erb"), ["ANDROID_BUNDLE_ID"]);
+  assert.deepEqual(keys('this.configService.get("TRUST_PROXY")', "main.ts"), ["TRUST_PROXY"]);
+  assert.deepEqual(keys('$key = env("LARAVEL_KEY");', "config/app.php"), ["LARAVEL_KEY"]);
+  assert.deepEqual(keys('char *v = getenv("C_TOKEN");', "main.c"), ["C_TOKEN"]);
+  assert.deepEqual(keys('System.get_env("ELIXIR_TOKEN")', "runtime.exs"), ["ELIXIR_TOKEN"]);
+  assert.deepEqual(keys('@Value("${SPRING_TOKEN}")', "Config.java"), ["SPRING_TOKEN"]);
+  assert.deepEqual(keys('const t = String.fromEnvironment("DART_TOKEN");', "main.dart"), ["DART_TOKEN"]);
 });
 
 test("reports the correct line numbers", () => {
