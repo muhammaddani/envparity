@@ -60,6 +60,14 @@ git push origin main --tags
 ```
 
 The workflow runs the tests, verifies that the tag matches `package.json`,
-publishes to npm with provenance and opens a GitHub release. It needs an
+publishes to npm with provenance and opens a GitHub release. Publishing needs an
 `NPM_TOKEN` repository secret (a granular npm token with read/write access to
-the `envguard` package).
+the `envguard` package); without it the publish step is skipped and only the
+GitHub release is created.
+
+Finally, move the floating major tag used by the GitHub Action:
+
+```bash
+git tag -f v1
+git push -f origin v1
+```
